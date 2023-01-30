@@ -9,10 +9,11 @@ class mapa:
         self.x = 135
         self.y = 63
         self.spn = (3.0, 3.0)
-        self.l = 'sat'
+        self.l = ['sat', 'map', 'scl']
+        self.index = 
         self.params = {
             'll': str(self.x) + ',' + str(self.y),
-            'l': str(self.l),
+            'l': str(self.l[self.index%3]),
             'spn': str(self.spn[0]) + ',' + str(self.spn[1])
         }
         
@@ -23,19 +24,17 @@ class mapa:
             print("Ошибка выполнения запроса:")
             print("Http статус:", response.status_code, "(", response.reason, ")")
             sys.exit(1)
-        print(11)
         return response
         
     def change_spn(self, x, y):
         if 0 <= x < 20 and 0 <= y < 20:
             self.spn = (x, y)
             self.params = {
-                'll': str(self.x) + ',' + str(self.y),
-                'l': str(self.l),
-                'spn': str(self.spn[0]) + ',' + str(self.spn[1])
+            'll': str(self.x) + ',' + str(self.y),
+            'l': str(self.l[self.index%3]),
+            'spn': str(self.spn[0]) + ',' + str(self.spn[1])
             }
             return self.request()
-        print(self.spn)
         return 0
             
     def change_coord(self, way):
@@ -49,12 +48,19 @@ class mapa:
             self.y += self.spn[1]
         self.params = {
             'll': str(self.x) + ',' + str(self.y),
-            'l': str(self.l),
+            'l': str(self.l[self.index%3]),
             'spn': str(self.spn[0]) + ',' + str(self.spn[1])
         }
         return self.request()
 
-    
+    def change_type(self):
+        self.index+=1
+        self.params = {
+            'll': str(self.x) + ',' + str(self.y),
+            'l': str(self.l[self.index%3]),
+            'spn': str(self.spn[0]) + ',' + str(self.spn[1])
+        }
+        return self.request()
         
 
 
