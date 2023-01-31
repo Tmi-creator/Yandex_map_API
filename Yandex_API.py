@@ -10,7 +10,7 @@ class mapa:
         self.y = 63
         self.spn = (3.0, 3.0)
         self.l = ['sat', 'map', 'scl']
-        self.index = 
+        self.index = 0
         self.params = {
             'll': str(self.x) + ',' + str(self.y),
             'l': str(self.l[self.index%3]),
@@ -96,6 +96,7 @@ while running:
                 x = map1.change_spn(map1.spn[0] + 1, map1.spn[1] + 1)
             if event.key - 1073741903 in [0, 1, 2, 3]:
                 x = map1.change_coord(event.key - 1073741903)
+            # todo: type selector
         if x == 0:
             pass
         else:
