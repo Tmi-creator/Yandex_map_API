@@ -4,39 +4,38 @@ import sys
 import pygame
 import requests
 
+
 class mapa:
     def __init__(self):
         self.x = 135
         self.y = 63
         self.spn = (3.0, 3.0)
-        self.l = ['sat', 'map', 'scl']
+        self.l = ['sat', 'map', 'skl']
         self.index = 0
+        self.set_params()
+
+    def set_params(self):
         self.params = {
             'll': str(self.x) + ',' + str(self.y),
-            'l': str(self.l[self.index%3]),
+            'l': str(self.l[self.index % 3]),
             'spn': str(self.spn[0]) + ',' + str(self.spn[1])
         }
-        
     def request(self):
-        search_api_server = 'https://static-maps.yandex.ru/1.x/'
+        search_api_server = 'http://static-maps.yandex.ru/1.x/'
         response = requests.get(search_api_server, params=self.params)
         if not response:
             print("Ошибка выполнения запроса:")
             print("Http статус:", response.status_code, "(", response.reason, ")")
             sys.exit(1)
         return response
-        
+
     def change_spn(self, x, y):
         if 0 <= x < 20 and 0 <= y < 20:
             self.spn = (x, y)
-            self.params = {
-            'll': str(self.x) + ',' + str(self.y),
-            'l': str(self.l[self.index%3]),
-            'spn': str(self.spn[0]) + ',' + str(self.spn[1])
-            }
+            self.set_params()
             return self.request()
         return 0
-            
+
     def change_coord(self, way):
         if way == 0 and -170 < self.x < 170:
             self.x += self.spn[0]
@@ -46,27 +45,16 @@ class mapa:
             self.y -= self.spn[1]
         if way == 3 and -80 < self.y < 80:
             self.y += self.spn[1]
-        self.params = {
-            'll': str(self.x) + ',' + str(self.y),
-            'l': str(self.l[self.index%3]),
-            'spn': str(self.spn[0]) + ',' + str(self.spn[1])
-        }
+        self.set_params()
         return self.request()
 
     def change_type(self):
-        self.index+=1
-        self.params = {
-            'll': str(self.x) + ',' + str(self.y),
-            'l': str(self.l[self.index%3]),
-            'spn': str(self.spn[0]) + ',' + str(self.spn[1])
-        }
+        self.index += 1
+        self.set_params()
         return self.request()
-        
-
 
 
 map1 = mapa()
-
 
 # Запишем полученное изображение в файл.
 map_file = "map.png"
@@ -91,20 +79,22 @@ while running:
         x = 0
         if event.type == pygame.KEYDOWN:
             if event.key == 1073741902:
-                x = map1.change_spn(map1.spn[0] - 1, map1.spn[1] - 1)
+                x = map1.change_spn(map1.spn[0] - 0.5, map1.spn[1] - 0.5)
             if event.key == 1073741899:
-                x = map1.change_spn(map1.spn[0] + 1, map1.spn[1] + 1)
+                x = map1.change_spn(map1.spn[0] + 0.5, map1.spn[1] + 0.5)
             if event.key - 1073741903 in [0, 1, 2, 3]:
                 x = map1.change_coord(event.key - 1073741903)
-            # todo: type selector
+            if event.key == 116:
+                x = map1.change_type()
+              
         if x == 0:
             pass
         else:
             with open(map_file, "wb") as file:
                 file.write(x.content)
-            
+
         screen.blit(pygame.image.load(map_file), (0, 0))
-    # обновление экрана
+        # обновление экрана
         pygame.display.flip()
 pygame.quit()
 
